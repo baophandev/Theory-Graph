@@ -1,0 +1,142 @@
+#include <stdio.h>
+
+//CAU TRUC DU LIEU KIEU LIST
+typedef int ElementType;
+typedef struct{
+    ElementType data[100];
+    int size;
+}List;
+
+void make_null_list(List *pL){
+    pL->size = 0;
+}
+
+// them mot phan tu vao cuoi danh sach
+void push_back(List *pL, ElementType x){
+    pL->data[pL->size] = x;
+    pL->size++;
+}
+
+ElementType element_at(List *pL, int i){
+    return pL->data[i-1];
+}
+
+
+typedef struct{
+    int n, m;
+    int A[100][100];
+}Graph;
+
+void init_graph(Graph *pG, int n){
+    pG->n = n;
+    pG->m = 0;
+    for(int i=1; i<=n; i++){
+        for(int j=1; j<=n; j++)
+            pG->A[i][j] = 0;
+    }
+}
+
+void add_edge(Graph *pG, int u, int v){
+    pG->A[u][v] = 1;
+    pG->A[u][v] = 1;
+    pG->m++;
+}
+
+int adjacent(Graph *pG, int u, int v){
+    return pG->A[u][v];
+}
+
+List neighbours(Graph *pG, int u){
+    List list;
+    for(int v=1; v<=pG->n; v++){
+        if(adjacent(pG, u, v))
+            push_back(&list, v);
+    }
+    return list;
+}
+
+//CAU TRUC DU LIEU QUEUE
+
+typedef struct{
+    int data[100];
+    int front, rear;
+}Queue;
+
+void make_null_queue(Queue *pQ){
+    pQ->front = 0;
+    pQ->rear = -1;
+}
+
+void enqueue(Queue *pQ, int x){
+    pQ->rear++;
+    pQ->data[pQ->rear] = x;
+}
+
+int front(Queue *pQ){
+    return pQ->data[pQ->front];
+}
+
+void dequeue(Queue *pQ){
+    pQ->front++;
+}
+
+int empty(Queue *pQ){
+    return pQ->front > pQ->rear;
+}
+
+// int mark[100];
+
+void BFS(Graph *pG, int s){
+    Queue Q;
+    int mark[100];
+    make_null_queue(&Q);
+    
+    //Khởi tạo mark chưa đỉn nào được xét
+    for(int j=1; j<=pG->n; j++){
+        mark[j] = 0;
+    }
+    
+    //Đưa s vào hàng đợi
+    enqueue(&Q, s);
+    mark[s] = 1;
+    
+    //Duyệt đồ thị
+    while(!empty(&Q)){
+        //Lấy phần tử đầu tiên trong hàng đợi
+        int x = front(&Q);
+        dequeue(&Q);
+        printf("%d\n", x);
+        //lấy đỉnh kề
+        List list = neighbours(pG, x);
+        
+        for(int j=1; j<=list.size; j++){
+            int i = element_at(&list, j);
+            if(mark[i] == 0){
+                mark[i] = 1;
+                enqueue(&Q, i);
+            }
+        }
+    }
+}
+
+
+int main() {
+	Graph G;
+	int n, m, e, u, v;
+
+	//Đọc số đỉnh và số cung & khởi tạo đồ thị
+	scanf("%d%d", &n, &m);
+	init_graph(&G, n);
+
+	//Đọc m cung và thêm vào đồ thị
+	for (e = 0; e < m; e++) {
+		scanf("%d%d", &u, &v);
+		add_edge(&G, u, v);
+	}
+	
+	BFS(&G, 1);
+	
+	return 0;
+}
+
+
